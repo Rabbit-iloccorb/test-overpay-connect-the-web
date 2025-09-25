@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>主控台</title>
+</head>
+<body>
+  <h1>歡迎來到主控台</h1>
+  <div id="menu"></div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get("role");
+
+    const menuDiv = document.getElementById("menu");
+
+    if (role === "admin") {
+      menuDiv.innerHTML = `
+        <p>您是管理員</p>
+        <ul>
+          <li><a href="admin.html">管理店家與餐點</a></li>
+          <li><a href="summary.html">團購訂單總覽</a></li>
+        </ul>
+      `;
+    } else if (role === "guest") {
+      menuDiv.innerHTML = `
+        <p>您是訪客</p>
+        <ul>
+          <li><a href="order.html">點餐頁面</a></li>
+          <li><a href="balance.html">查詢餘額</a></li>
+        </ul>
+      `;
+    } else {
+      menuDiv.innerHTML = `<p>角色錯誤，請重新登入</p>`;
+    }
+  </script>
+</body>
+</html>

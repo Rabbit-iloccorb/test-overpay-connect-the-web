@@ -1,0 +1,90 @@
+<!-- Login Panel-->
+<div class="modal fade" id="loginPanel" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="loginTitle">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginTitle">Login</h5>
+      </div>
+      <div class="modal-body">
+        <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+
+        <label for="account">Email</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="account" placeholder="請輸入 Email" />
+        </div>
+
+        <label for="pwd">Password</label>
+        <div class="input-group mb-3">
+          <input type="password" class="form-control" id="pwd" placeholder="請輸入密碼" />
+        </div>
+
+        <div id="firebaseui-auth-container"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="loginSmtBtn" class="btn btn-primary">Login</button>
+        <button type="button" id="googleLoginBtn" class="btn btn-dark">Login with Google</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 當按下 Email 登入
+  $("#loginSmtBtn").click(function () {
+    signin($("#account").val(), $("#pwd").val());
+  });
+
+  // 當按下 Google 登入
+  $("#googleLoginBtn").click(function () {
+    signinGoogle();
+  });
+
+  // 初始化 modal：沒登入時自動跳出，不能用鍵盤 Esc 或點背景關閉
+  $("#loginPanel").modal({
+    keyboard: false,
+    backdrop: 'static',
+    show: false
+  });
+
+  var loginUser;
+
+  // 監聽 Firebase 登入狀態
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      loginUser = user;
+      $("#navUser").html(user.displayName || user.email);
+      $("#signoutSmtBtn").removeClass("disabled");
+      $("#loginPanel").modal('hide');
+      console.log("User is logged in");
+      $("#loginAlert").addClass("d-none");
+    } else {
+      loginUser = null;
+      $("#loginPanel").modal('show');  // 沒登入自動彈出且無法關閉
+      $("#navUser").html("");
+      $("#signoutSmtBtn").addClass("disabled");
+      console.log("User is not logged in yet.");
+    }
+  });
+
+  // 顯示登入錯誤訊息
+  function loginError(msg) {
+    $("#loginAlert").html(msg);
+    $("#loginAlert").removeClass("d-none");
+  }
+  function signinGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      // 登入成功
+      console.log("Google 登入成功", result.user);
+      $("#loginAlert").addClass("d-none");
+      $("#loginPanel").modal('hide');
+    })
+    .catch((error) => {
+      console.error("Google 登入失敗", error);
+      $("#loginAlert").html("Google 登入失敗：" + error.message);
+      $("#loginAlert").removeClass("d-none");
+    });
+}
+
+</script>
